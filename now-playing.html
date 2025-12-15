@@ -144,6 +144,18 @@
             <div class="label">Polling</div>
             <div class="value" id="polling">Every 10s</div>
           </div>
+          <div class="row">
+            <div class="label">Album</div>
+            <div class="value" id="album">—</div>
+          </div>
+          <div class="row">
+            <div class="label">Year</div>
+            <div class="value" id="year">—</div>
+          </div>
+          <div class="row">
+            <div class="label">Track ID</div>
+            <div class="value mono" id="track-id">—</div>
+          </div>
         </div>
       </div>
       <pre id="raw">{}</pre>
@@ -174,6 +186,9 @@
     const artEl = document.getElementById('art');
     const rawEl = document.getElementById('raw');
     const pollingEl = document.getElementById('polling');
+    const albumEl = document.getElementById('album');
+    const yearEl = document.getElementById('year');
+    const trackIdEl = document.getElementById('track-id');
 
     function badge(text, cls) {
       return `<span class="status ${cls}">${text}</span>`;
@@ -282,6 +297,9 @@
       titleEl.textContent = 'Nothing playing';
       artistsEl.textContent = '—';
       artEl.textContent = 'No artwork';
+      albumEl.textContent = '—';
+      yearEl.textContent = '—';
+      trackIdEl.textContent = '—';
       rawEl.textContent = '{}';
     }
 
@@ -309,6 +327,9 @@
         if (data?.item) {
           titleEl.textContent = data.item.name || 'Unknown track';
           artistsEl.textContent = (data.item.artists || []).map((a) => a.name).join(', ') || 'Unknown artist';
+          albumEl.textContent = data.item.album?.name || 'Unknown album';
+          yearEl.textContent = (data.item.album?.release_date || '—').slice(0, 4) || '—';
+          trackIdEl.textContent = data.item.id || '—';
           const img = data.item.album?.images?.[0]?.url;
           if (img) artEl.innerHTML = `<img src="${img}" alt="Album art">`;
           else artEl.textContent = 'No artwork';
@@ -316,6 +337,9 @@
           titleEl.textContent = 'Nothing playing';
           artistsEl.textContent = '—';
           artEl.textContent = 'No artwork';
+          albumEl.textContent = '—';
+          yearEl.textContent = '—';
+          trackIdEl.textContent = '—';
         }
       } catch (err) {
         renderAuth(err.message || 'Error', 'error');
