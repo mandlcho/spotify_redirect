@@ -79,15 +79,10 @@ If your region uses `open.larksuite.com`, set `LARK_BASE` accordingly.
 
 ## GitHub Pages now-playing view
 
-Static viewer that shows your current Spotify playback via PKCE (no server secrets) is available at `now-playing.html`.
+`now-playing.html` is a simple page that shows your current Spotify track (client-side PKCE, no secrets).
 
-1. Publish the repo with GitHub Pages (Settings → Pages → Deploy from branch → `main` → `/ (root)`). The live URL will be `https://<your-username>.github.io/spotify_redirect/`.
-2. Open `https://<your-username>.github.io/spotify_redirect/now-playing.html`.
-3. Enter your Spotify `client_id` (from your Spotify app) and click **Save Client ID**.
-4. Click **Connect to Spotify**. This runs the Authorization Code with PKCE flow against the same page as redirect.
-5. After authorization, the page shows your current track (polls every 10s). Tokens live only in your browser storage; **Clear tokens** removes them.
-
-Notes:
-- Scopes requested: `user-read-currently-playing user-read-playback-state`.
-- PKCE is used, so no client secret is stored. Refresh tokens are kept in `localStorage` for convenience.
-- You must add the exact Redirect URI shown on the page (e.g., `https://mandlcho.github.io/spotify_redirect/now-playing.html`) to your Spotify app’s Redirect URIs list or you’ll get `INVALID_CLIENT: Invalid redirect URI`.
+1. Enable GitHub Pages on this repo (Settings → Pages → Deploy from branch → `main` → `/ (root)`).
+2. Visit `https://<your-username>.github.io/spotify_redirect/now-playing.html`.
+3. Copy the redirect URI shown on the page and add it to your Spotify app Redirect URIs (must match exactly).
+4. Paste your `client_id`, save it, and click **Connect to Spotify**.
+5. After approving scopes (`user-read-currently-playing user-read-playback-state`), the page polls every 10s and shows what’s playing. Tokens stay in your browser; **Clear stored tokens** wipes them.
