@@ -76,3 +76,17 @@ Behavior:
 - Set status: `POST /open-apis/contact/v3/users/{user_id}/custom_status?user_id_type=user_id`
 
 If your region uses `open.larksuite.com`, set `LARK_BASE` accordingly.
+
+## GitHub Pages now-playing view
+
+Static viewer that shows your current Spotify playback via PKCE (no server secrets) is available at `now-playing.html`.
+
+1. Publish the repo with GitHub Pages (Settings → Pages → Deploy from branch → `main` → `/ (root)`). The live URL will be `https://<your-username>.github.io/spotify_redirect/`.
+2. Open `https://<your-username>.github.io/spotify_redirect/now-playing.html`.
+3. Enter your Spotify `client_id` (from your Spotify app) and click **Save Client ID**.
+4. Click **Connect to Spotify**. This runs the Authorization Code with PKCE flow against the same page as redirect.
+5. After authorization, the page shows your current track (polls every 10s). Tokens live only in your browser storage; **Clear tokens** removes them.
+
+Notes:
+- Scopes requested: `user-read-currently-playing user-read-playback-state`.
+- PKCE is used, so no client secret is stored. Refresh tokens are kept in `localStorage` for convenience.

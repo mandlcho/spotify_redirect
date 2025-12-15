@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify Now Playing → Lark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 20% 20%, #e0f7ff 0, #f2f6ff 30%, #fef6ec 65%, #fdf4ff 100%);
+      --card: rgba(255, 255, 255, 0.9);
+      --text: #0f172a;
+      --muted: #5b6475;
+      --accent: #0f9d58;
+      --shadow: 0 16px 60px rgba(15, 23, 42, 0.08);
+      --border: rgba(12, 18, 36, 0.08);
+      --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+      font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+      color: var(--text);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 32px 18px 64px;
+    }
+    main { width: min(960px, 100%); display: flex; flex-direction: column; gap: 18px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+    }
+    .hero { display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 0%, rgba(15, 157, 88, 0.12), transparent 45%);
+      pointer-events: none;
+    }
+    h1 { margin: 0; font-size: clamp(1.6rem, 2vw + 1rem, 2.3rem); letter-spacing: -0.02em; }
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #e8f7ff;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      width: fit-content;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+    }
+    p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      font-family: var(--mono);
+    }
+    button {
+      border: none;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      width: 100%;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(15, 23, 42, 0.24); }
+    button:active { transform: translateY(0); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2); }
+    button.secondary { background: #ffffff; color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    button.danger { background: #b91c1c; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border: 1px dashed var(--border); border-radius: 12px; background: rgba(15, 157, 88, 0.03); }
+    .row .label { color: var(--muted); font-size: 0.9rem; }
+    .row .value { font-weight: 600; text-align: right; }
+    .row .value.mono { font-family: var(--mono); word-break: break-all; }
+    .status {
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px;
+      border-radius: 12px; font-weight: 600;
+    }
+    .status.ok { background: rgba(15, 157, 88, 0.12); color: #0b7b45; }
+    .status.warn { background: rgba(217, 119, 6, 0.15); color: #b45309; }
+    .status.error { background: rgba(185, 28, 28, 0.12); color: #b91c1c; }
+    .track {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+    .track img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    }
+    .track h3 { margin: 0; font-size: 1.1rem; }
+    .track .artists { margin: 6px 0 0; color: var(--muted); }
+    pre {
+      background: #0b1222;
+      color: #e3f2ff;
+      padding: 14px;
+      border-radius: 12px;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      margin: 12px 0 0;
+      border: 1px solid #0d1b36;
+      max-height: 280px;
+    }
+    @media (max-width: 720px) {
+      body { padding: 18px 14px 48px; }
+      .track { grid-template-columns: 1fr; }
+      .track img { width: 100%; height: auto; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card hero">
+      <div class="pill">Spotify Now Playing</div>
+      <h1>Live playback preview for GitHub Pages</h1>
+      <p>Authorize with Spotify (PKCE, no server) and display your current track. You can use this URL as the redirect URI. Tokens stay in your browser storage.</p>
+    </section>
+
+    <section class="card grid">
+      <div>
+        <label for="client-id">Spotify Client ID</label>
+        <input id="client-id" type="text" placeholder="Paste your client_id" autocomplete="off" spellcheck="false">
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+          <button id="save-client">Save Client ID</button>
+          <button class="secondary" id="start-auth">Connect to Spotify</button>
+          <button class="secondary" id="clear-session">Clear tokens</button>
+        </div>
+        <p style="margin-top:10px;">Scopes requested: <code style="font-family: var(--mono);">user-read-currently-playing user-read-playback-state</code></p>
+      </div>
+      <div class="row">
+        <div class="label">Auth state</div>
+        <div class="value" id="auth-state"><span class="status warn">Not connected</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row" style="margin-bottom:12px; background: rgba(15,157,88,0.06);">
+        <div class="label">Polling</div>
+        <div class="value mono" id="polling-info">—</div>
+      </div>
+      <div id="track" class="track">
+        <div style="background:#f1f5f9; border-radius:14px; height:120px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">No artwork</div>
+        <div>
+          <h3 id="track-title">Nothing playing</h3>
+          <div class="artists" id="track-artists">—</div>
+        </div>
+      </div>
+      <pre id="raw-box">{}</pre>
+    </section>
+  </main>
+
+  <script>
+    const storage = {
+      clientId: 'spotify_client_id',
+      refresh: 'spotify_refresh_token',
+      access: 'spotify_access_token',
+      expiry: 'spotify_access_expiry',
+      verifier: 'spotify_code_verifier'
+    };
+    const scopes = ['user-read-currently-playing', 'user-read-playback-state'];
+    const redirectUri = window.location.origin + window.location.pathname;
+
+    const clientIdInput = document.getElementById('client-id');
+    const saveBtn = document.getElementById('save-client');
+    const authBtn = document.getElementById('start-auth');
+    const clearBtn = document.getElementById('clear-session');
+    const authState = document.getElementById('auth-state');
+    const trackTitle = document.getElementById('track-title');
+    const trackArtists = document.getElementById('track-artists');
+    const trackEl = document.getElementById('track');
+    const rawBox = document.getElementById('raw-box');
+    const pollingInfo = document.getElementById('polling-info');
+
+    function badge(text, kind) {
+      const span = document.createElement('span');
+      span.className = `status ${kind}`;
+      span.textContent = text;
+      return span;
+    }
+
+    function loadClientId() {
+      const fromStorage = localStorage.getItem(storage.clientId);
+      if (fromStorage) return fromStorage;
+      const fromUrl = new URLSearchParams(window.location.search).get('client_id');
+      return fromUrl || '';
+    }
+
+    function saveClientId() {
+      const cid = clientIdInput.value.trim();
+      if (!cid) return;
+      localStorage.setItem(storage.clientId, cid);
+      renderAuthState('Client ID saved', 'ok');
+    }
+
+    function renderAuthState(text, kind) {
+      authState.innerHTML = '';
+      authState.appendChild(badge(text, kind));
+    }
+
+    function setTrackDisplay(data) {
+      if (!data || !data.item) {
+        trackTitle.textContent = 'Nothing playing';
+        trackArtists.textContent = '—';
+        trackEl.querySelector('div').innerHTML = 'No artwork';
+        rawBox.textContent = JSON.stringify(data || {}, null, 2);
+        return;
+      }
+      const track = data.item;
+      trackTitle.textContent = track.name || 'Unknown track';
+      trackArtists.textContent = (track.artists || []).map((a) => a.name).join(', ') || 'Unknown artist';
+      const img = track.album?.images?.[0]?.url;
+      if (img) {
+        trackEl.querySelector('div').innerHTML = `<img src="${img}" alt="Album art">`;
+      } else {
+        trackEl.querySelector('div').innerHTML = 'No artwork';
+      }
+      rawBox.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function randomString(len = 64) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      const array = new Uint32Array(len);
+      crypto.getRandomValues(array);
+      for (let i = 0; i < len; i++) result += chars[array[i] % chars.length];
+      return result;
+    }
+
+    async function sha256(input) {
+      const data = new TextEncoder().encode(input);
+      return crypto.subtle.digest('SHA-256', data);
+    }
+
+    function base64UrlEncode(buffer) {
+      return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    }
+
+    async function startAuth() {
+      const clientId = clientIdInput.value.trim();
+      if (!clientId) {
+        renderAuthState('Missing client_id', 'error');
+        return;
+      }
+      localStorage.setItem(storage.clientId, clientId);
+      const verifier = randomString(64);
+      const challenge = base64UrlEncode(await sha256(verifier));
+      localStorage.setItem(storage.verifier, verifier);
+      const authUrl = new URL('https://accounts.spotify.com/authorize');
+      authUrl.searchParams.set('client_id', clientId);
+      authUrl.searchParams.set('response_type', 'code');
+      authUrl.searchParams.set('redirect_uri', redirectUri);
+      authUrl.searchParams.set('code_challenge_method', 'S256');
+      authUrl.searchParams.set('code_challenge', challenge);
+      authUrl.searchParams.set('scope', scopes.join(' '));
+      authUrl.searchParams.set('state', randomString(12));
+      window.location.href = authUrl.toString();
+    }
+
+    async function exchangeCodeForToken(code) {
+      const clientId = localStorage.getItem(storage.clientId);
+      const verifier = localStorage.getItem(storage.verifier);
+      const body = new URLSearchParams({
+        client_id: clientId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: verifier
+      });
+      const resp = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      if (!resp.ok) throw new Error(`token exchange ${resp.status}`);
+      const data = await resp.json();
+      storeTokens(data);
+    }
+
+    async function refreshAccessToken() {
+      const refresh = localStorage.getItem(storage.refresh);
+      const clientId = localStorage.getItem(storage.clientId);
+      if (!refresh || !clientId) throw new Error('missing refresh token');
+      const body = new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refresh,
+        client_id: clientId
+      });
+      const resp = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      if (!resp.ok) throw new Error(`refresh failed ${resp.status}`);
+      const data = await resp.json();
+      storeTokens(data, false);
+    }
+
+    function storeTokens(data, includeRefresh = true) {
+      if (data.access_token) localStorage.setItem(storage.access, data.access_token);
+      if (includeRefresh && data.refresh_token) localStorage.setItem(storage.refresh, data.refresh_token);
+      const expiresMs = Date.now() + (data.expires_in || 3600) * 1000 - 60 * 1000;
+      localStorage.setItem(storage.expiry, String(expiresMs));
+      renderAuthState('Connected', 'ok');
+    }
+
+    async function ensureAccessToken() {
+      const access = localStorage.getItem(storage.access);
+      const expiry = Number(localStorage.getItem(storage.expiry));
+      if (access && expiry && Date.now() < expiry) return access;
+      await refreshAccessToken();
+      return localStorage.getItem(storage.access);
+    }
+
+    async function fetchNowPlaying() {
+      try {
+        const token = await ensureAccessToken();
+        if (!token) throw new Error('no token');
+        const resp = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (resp.status === 204) {
+          setTrackDisplay(null);
+          return;
+        }
+        if (resp.status === 401) {
+          await refreshAccessToken();
+          return;
+        }
+        if (!resp.ok) throw new Error(`now playing ${resp.status}`);
+        const data = await resp.json();
+        setTrackDisplay(data);
+      } catch (err) {
+        renderAuthState(err.message || 'Error', 'error');
+      }
+    }
+
+    function clearSession() {
+      [storage.access, storage.refresh, storage.expiry, storage.verifier].forEach((k) => localStorage.removeItem(k));
+      renderAuthState('Tokens cleared', 'warn');
+      setTrackDisplay(null);
+      rawBox.textContent = '{}';
+    }
+
+    function handleRedirect() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code) {
+        exchangeCodeForToken(code)
+          .then(() => {
+            params.delete('code');
+            params.delete('state');
+            const next = `${window.location.origin}${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.replaceState({}, document.title, next);
+            fetchNowPlaying();
+          })
+          .catch((err) => renderAuthState(err.message || 'Exchange failed', 'error'));
+      }
+    }
+
+    function init() {
+      const storedClientId = loadClientId();
+      if (storedClientId) clientIdInput.value = storedClientId;
+      if (localStorage.getItem(storage.access)) renderAuthState('Connected', 'ok');
+      const interval = 10000;
+      pollingInfo.textContent = `Every ${interval / 1000}s`;
+      handleRedirect();
+      fetchNowPlaying();
+      setInterval(fetchNowPlaying, interval);
+    }
+
+    saveBtn.addEventListener('click', saveClientId);
+    authBtn.addEventListener('click', startAuth);
+    clearBtn.addEventListener('click', clearSession);
+    init();
+  </script>
+</body>
+</html>
