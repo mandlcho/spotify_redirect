@@ -4,40 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spotify Now Playing</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fef9e6;
+      --bg: #f7f7f7;
       --panel: #ffffff;
-      --bezel: #0c0c0c;
-      --text: #111111;
-      --muted: #424242;
-      --accent: #ff2d55;
-      --accent-2: #2f9bff;
-      --border: #0f0f0f;
-      --shadow: 10px 10px 0 #0f0f0f;
-      --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
-      --pixel: 'Press Start 2P', 'Inter', system-ui, sans-serif;
-      font-family: 'Inter', system-ui, sans-serif;
+      --text: #1c1c1c;
+      --muted: #6b6b6b;
+      --accent: #111111;
+      --accent-2: #e3e3e3;
+      --border: #dcdcdc;
+      --shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
+      --mono: "Consolas", "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+      font-family: 'Consolas', 'SFMono-Regular', ui-monospace, monospace;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        repeating-linear-gradient(0deg, rgba(255,45,85,0.08) 0, rgba(255,45,85,0.08) 10px, transparent 10px, transparent 20px),
-        repeating-linear-gradient(90deg, rgba(47,155,255,0.08) 0, rgba(47,155,255,0.08) 12px, transparent 12px, transparent 24px),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
       display: flex;
       justify-content: center;
-      padding: 36px 18px 70px;
+      padding: 32px 18px 60px;
     }
-    main { width: min(960px, 100%); }
+    main { width: min(860px, 100%); }
     .winamp {
-      border: 6px solid var(--border);
+      border: 1px solid var(--border);
       background: var(--panel);
       box-shadow: var(--shadow);
     }
@@ -45,15 +37,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
-      background: linear-gradient(90deg, #ffef00, #ffd1d1);
-      border-bottom: 4px solid var(--border);
-      font-family: var(--pixel);
-      font-size: 12px;
-      letter-spacing: 0.05em;
-      color: #000;
-      text-transform: uppercase;
-      gap: 10px;
+      padding: 14px 16px;
+      background: #f1f1f1;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      color: var(--text);
     }
     .titlebar .lights {
       display: flex;
@@ -71,15 +60,14 @@
 
     .title-actions { display: flex; align-items: center; gap: 10px; }
     .mini-btn {
-      border: 1px solid #050505;
-      background: #fff;
-      color: #000;
-      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 8px 12px;
       border-radius: 6px;
-      font-family: var(--pixel);
-      font-size: 10px;
+      font-size: 12px;
       cursor: pointer;
-      box-shadow: 3px 3px 0 #000;
+      box-shadow: none;
     }
     .panel {
       display: grid;
@@ -89,50 +77,50 @@
     }
 
     .section {
-      background: #fdfdfd;
-      border: 4px solid var(--border);
-      box-shadow: 6px 6px 0 #000;
-      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      border-radius: 10px;
     }
 
-    h1 { margin: 0 0 8px; letter-spacing: 0.01em; font-family: var(--pixel); font-size: 18px; color: #000; }
-    p { margin: 0; color: var(--muted); line-height: 1.5; font-weight: 600; }
+    h1 { margin: 0 0 8px; letter-spacing: 0.01em; font-size: 18px; color: var(--text); font-weight: 700; }
+    p { margin: 0; color: var(--muted); line-height: 1.5; font-weight: 500; }
     label { display: block; margin: 12px 0 6px; font-weight: 600; }
     input[type="text"] {
       width: 100%;
       padding: 12px 14px;
-      border-radius: 6px;
-      border: 2px solid #0f0f0f;
-      background: #fff;
-      color: #000;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+      color: var(--text);
       font-family: var(--mono);
-      box-shadow: 3px 3px 0 #000;
+      box-shadow: none;
     }
     button {
       border: none;
       background: var(--accent);
-      color: #fff;
+      color: #fdfdfd;
       padding: 12px 16px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 700;
       cursor: pointer;
       width: 100%;
       margin-top: 10px;
       transition: transform 120ms ease, box-shadow 120ms ease;
-      box-shadow: 4px 4px 0 #000;
-      font-family: var(--pixel);
-      font-size: 11px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      font-size: 13px;
     }
-    button.secondary { background: var(--accent-2); color: #fff; border: 2px solid #0f0f0f; box-shadow: 4px 4px 0 #000; }
+    button.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: none; }
     button:active { transform: translateY(1px); }
 
-    .row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 6px; background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; }
-    .row .label { color: #000; font-weight: 700; font-family: var(--pixel); font-size: 10px; }
-    .row .value { font-family: var(--mono); word-break: break-all; text-align: right; color: #000; }
-    .status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-weight: 700; font-family: var(--pixel); font-size: 10px; }
-    .ok { background: #000; color: #9ef5be; border: 2px solid #000; }
-    .warn { background: #ffef00; color: #000; border: 2px solid #000; }
-    .error { background: #ff2d55; color: #fff; border: 2px solid #000; }
+    .row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #fafafa; border: 1px solid var(--border); }
+    .row .label { color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .row .value { font-family: var(--mono); word-break: break-all; text-align: right; color: var(--text); }
+    .status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-weight: 700; font-size: 11px; }
+    .ok { background: #e7f6ed; color: #0f8b4b; border: 1px solid #b7dfc6; }
+    .warn { background: #fff7e0; color: #b38600; border: 1px solid #e7d4a4; }
+    .error { background: #ffe8e8; color: #b42525; border: 1px solid #e6b1b1; }
     .track {
       display: grid;
       grid-template-columns: 140px 1fr;
@@ -142,31 +130,30 @@
     .art {
       width: 140px;
       height: 140px;
-      border-radius: 4px;
-      background: #fff3a6;
+      border-radius: 8px;
+      background: #f4f4f4;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #000;
+      color: #7a7a7a;
       overflow: hidden;
-      box-shadow: 4px 4px 0 #000;
-      border: 3px solid #000;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
     .art img { width: 100%; height: 100%; object-fit: cover; }
-    .track h3 { margin: 0; font-family: var(--pixel); letter-spacing: 0.02em; font-size: 16px; color: #000; }
-    .track .artists { margin: 6px 0 0; color: #000; font-family: var(--pixel); font-size: 11px; }
+    .track h3 { margin: 0; font-family: var(--mono); letter-spacing: 0.01em; font-size: 16px; color: var(--text); }
+    .track .artists { margin: 6px 0 0; color: var(--muted); font-family: var(--mono); font-size: 12px; }
     .hidden { display: none !important; }
     pre {
-      background: #fff;
-      border: 3px solid #000;
-      border-radius: 6px;
+      background: #0f0f0f;
+      border: 1px solid #0f0f0f;
+      border-radius: 8px;
       padding: 12px;
       overflow: auto;
       font-family: var(--mono);
       font-size: 0.9rem;
       max-height: 240px;
-      color: #000;
-      box-shadow: 4px 4px 0 #000;
+      color: #d1f1d7;
     }
     @media (max-width: 640px) {
       .panel { grid-template-columns: 1fr; }
@@ -178,14 +165,9 @@
 <body>
   <main class="winamp">
     <div class="titlebar">
-      <span>Chaotic Now Playing</span>
+      <span>Spotify Now Playing</span>
       <div class="title-actions">
-        <button class="mini-btn" id="toggle-settings">Hide Settings</button>
-        <div class="lights">
-          <div class="light on"></div>
-          <div class="light"></div>
-          <div class="light"></div>
-        </div>
+        <button class="mini-btn" id="toggle-settings">Show Settings</button>
       </div>
     </div>
     <div class="panel">
