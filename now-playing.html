@@ -152,6 +152,13 @@
           <button class="secondary" id="clear-session">Clear tokens</button>
         </div>
         <p style="margin-top:10px;">Scopes requested: <code style="font-family: var(--mono);">user-read-currently-playing user-read-playback-state</code></p>
+        <div class="row" style="margin-top:10px; background: rgba(15,157,88,0.06);">
+          <div class="label">Register this Redirect URI in your Spotify app</div>
+          <div class="value mono" id="redirect-uri-display">—</div>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="secondary" id="copy-redirect">Copy Redirect URI</button>
+        </div>
       </div>
       <div class="row">
         <div class="label">Auth state</div>
@@ -190,12 +197,14 @@
     const saveBtn = document.getElementById('save-client');
     const authBtn = document.getElementById('start-auth');
     const clearBtn = document.getElementById('clear-session');
+    const copyRedirectBtn = document.getElementById('copy-redirect');
     const authState = document.getElementById('auth-state');
     const trackTitle = document.getElementById('track-title');
     const trackArtists = document.getElementById('track-artists');
     const trackEl = document.getElementById('track');
     const rawBox = document.getElementById('raw-box');
     const pollingInfo = document.getElementById('polling-info');
+    const redirectDisplay = document.getElementById('redirect-uri-display');
 
     function badge(text, kind) {
       const span = document.createElement('span');
@@ -392,14 +401,26 @@
       if (localStorage.getItem(storage.access)) renderAuthState('Connected', 'ok');
       const interval = 10000;
       pollingInfo.textContent = `Every ${interval / 1000}s`;
+      redirectDisplay.textContent = redirectUri;
       handleRedirect();
       fetchNowPlaying();
       setInterval(fetchNowPlaying, interval);
     }
 
+    function copyRedirect() {
+      navigator.clipboard?.writeText(redirectUri).then(() => {
+        copyRedirectBtn.textContent = 'Copied!';
+        setTimeout(() => (copyRedirectBtn.textContent = 'Copy Redirect URI'), 1200);
+      }).catch(() => {
+        copyRedirectBtn.textContent = 'Copy failed';
+        setTimeout(() => (copyRedirectBtn.textContent = 'Copy Redirect URI'), 1200);
+      });
+    }
+
     saveBtn.addEventListener('click', saveClientId);
     authBtn.addEventListener('click', startAuth);
     clearBtn.addEventListener('click', clearSession);
+    copyRedirectBtn.addEventListener('click', copyRedirect);
     init();
   </script>
 </body>

@@ -90,3 +90,4 @@ Static viewer that shows your current Spotify playback via PKCE (no server secre
 Notes:
 - Scopes requested: `user-read-currently-playing user-read-playback-state`.
 - PKCE is used, so no client secret is stored. Refresh tokens are kept in `localStorage` for convenience.
+- You must add the exact Redirect URI shown on the page (e.g., `https://mandlcho.github.io/spotify_redirect/now-playing.html`) to your Spotify app’s Redirect URIs list or you’ll get `INVALID_CLIENT: Invalid redirect URI`.
