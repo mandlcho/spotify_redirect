@@ -28,3 +28,51 @@ Then set your redirect URI to `http://localhost:3000` (or the port you used) and
 - The page never transmits tokens except when you explicitly click **Send payload to opener**, which uses `postMessage`.
 - The hash fragment is cleared from the address bar shortly after parsing to reduce accidental leakage.
 - Scopes, state, and raw parameters are preserved in the rendered payload to help with debugging.
+
+## Spotify → Lark custom status sync
+
+A minimal Node 18+ script (`status-sync.js`) pulls your Spotify "currently playing" track and updates your Lark/Feishu custom status.
+
+### Prereqs
+- Spotify app with scopes: `user-read-currently-playing user-read-playback-state`.
+- Lark/Feishu internal app with permission to write custom status (e.g., `contact:employee_custom_status:write`).
+- Lark user identifier (`user_id` or `open_id`).
+
+### One-time setup
+1. Use `index.html` as your redirect URI and complete the Spotify auth to get a refresh token:
+   ```bash
+   curl -u "$SPOTIFY_CLIENT_ID:$SPOTIFY_CLIENT_SECRET" \
+     -d "grant_type=authorization_code&code=YOUR_CODE&redirect_uri=YOUR_REDIRECT_URI" \
+     https://accounts.spotify.com/api/token
+   ```
+   Save the `refresh_token`.
+2. From Lark/Feishu app settings, note `app_id` and `app_secret`. Confirm your base API URL (`https://open.feishu.cn` or `https://open.larksuite.com`).
+3. Get your `user_id` (or `open_id`) from the admin console or `/open-apis/contact/v3/users/me`.
+
+### Run the sync
+```bash
+export SPOTIFY_CLIENT_ID=...
+export SPOTIFY_CLIENT_SECRET=...
+export SPOTIFY_REFRESH_TOKEN=...
+export LARK_APP_ID=...
+export LARK_APP_SECRET=...
+export LARK_USER_ID=...
+# optional overrides
+export LARK_USER_ID_TYPE=user_id   # or open_id
+export LARK_BASE=https://open.feishu.cn
+export POLL_SECONDS=45
+export STATUS_DURATION_SECONDS=3600
+
+node status-sync.js
+```
+
+Behavior:
+- Polls Spotify every `POLL_SECONDS` for the current track.
+- Sets Lark custom status to `🎧 Track — Artist` when playing.
+- Clears the status when nothing is playing.
+
+### Lark API used
+- Tenant access token: `POST /open-apis/auth/v3/tenant_access_token/internal/`
+- Set status: `POST /open-apis/contact/v3/users/{user_id}/custom_status?user_id_type=user_id`
+
+If your region uses `open.larksuite.com`, set `LARK_BASE` accordingly.
