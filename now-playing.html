@@ -6,71 +6,118 @@
   <title>Spotify Now Playing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1222;
-      --card: #0f172a;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #22c55e;
-      --border: #1f2937;
-      --shadow: 0 18px 80px rgba(0, 0, 0, 0.45);
+      --bg: #1b1b1b;
+      --panel: #2c2f30;
+      --bezel: #0c0c0c;
+      --text: #dfe9e7;
+      --muted: #7aa6a0;
+      --accent: #1db954;
+      --border: #0f0f0f;
+      --shadow: 0 18px 80px rgba(0, 0, 0, 0.55);
       --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
-      font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+      --pixel: 'Press Start 2P', 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 15% 20%, rgba(34,197,94,0.2), transparent 30%), var(--bg);
+      background:
+        repeating-linear-gradient(45deg, #171717 0, #171717 10px, #1d1d1d 10px, #1d1d1d 20px),
+        var(--bg);
       color: var(--text);
       display: flex;
       justify-content: center;
-      padding: 32px 18px 60px;
+      padding: 36px 18px 70px;
     }
-    main { width: min(900px, 100%); display: flex; flex-direction: column; gap: 16px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 20px;
+    main { width: min(960px, 100%); }
+    .winamp {
+      border: 4px solid var(--bezel);
+      background: var(--panel);
       box-shadow: var(--shadow);
     }
-    h1 { margin: 0 0 6px; letter-spacing: -0.02em; }
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: linear-gradient(90deg, #101112, #17191b);
+      border-bottom: 2px solid #050505;
+      font-family: var(--pixel);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: #9ef5be;
+      text-transform: uppercase;
+    }
+    .titlebar .lights {
+      display: flex;
+      gap: 6px;
+    }
+    .light {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: #2f2f2f;
+      border: 1px solid #050505;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.4);
+    }
+    .light.on { background: #32ff77; box-shadow: 0 0 8px #32ff77, inset 0 -2px 0 rgba(0,0,0,0.4); }
+
+    .panel {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .section {
+      background: #1e2122;
+      border: 1px solid #0b0b0b;
+      box-shadow: inset 0 0 0 1px #2c2c2c;
+      padding: 14px;
+    }
+
+    h1 { margin: 0 0 8px; letter-spacing: -0.02em; font-family: var(--pixel); font-size: 18px; color: #9ef5be; }
     p { margin: 0; color: var(--muted); line-height: 1.5; }
     label { display: block; margin: 12px 0 6px; font-weight: 600; }
     input[type="text"] {
       width: 100%;
       padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #0b1020;
+      border-radius: 10px;
+      border: 1px solid #0f0f0f;
+      background: #0f1214;
       color: var(--text);
       font-family: var(--mono);
+      box-shadow: inset 0 0 0 1px #1f2629;
     }
     button {
       border: none;
-      background: var(--accent);
-      color: #0b1222;
+      background: linear-gradient(180deg, #24d36b 0%, #12a54c 100%);
+      color: #03120a;
       padding: 12px 16px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: 700;
       cursor: pointer;
       width: 100%;
       margin-top: 10px;
       transition: transform 120ms ease, box-shadow 120ms ease;
-      box-shadow: 0 12px 30px rgba(34, 197, 94, 0.25);
+      box-shadow: 0 12px 26px rgba(36, 211, 107, 0.35);
+      font-family: var(--pixel);
+      font-size: 11px;
     }
-    button.secondary { background: #111827; color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    button.secondary { background: linear-gradient(180deg, #1c1f21 0%, #121415 100%); color: var(--text); border: 1px solid #050505; box-shadow: inset 0 0 0 1px #2c2f31; }
     button:active { transform: translateY(1px); }
-    .row { display: flex; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 12px; background: #0b1020; border: 1px solid var(--border); }
+
+    .row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #121415; border: 1px solid #050505; }
     .row .label { color: var(--muted); }
     .row .value { font-family: var(--mono); word-break: break-all; text-align: right; }
-    .status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; font-weight: 700; }
-    .ok { background: rgba(34,197,94,0.15); color: #22c55e; }
-    .warn { background: rgba(234,179,8,0.15); color: #eab308; }
-    .error { background: rgba(248,113,113,0.15); color: #f87171; }
+    .status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-weight: 700; font-family: var(--pixel); font-size: 10px; }
+    .ok { background: rgba(34,197,94,0.15); color: #9ef5be; }
+    .warn { background: rgba(234,179,8,0.15); color: #facc15; }
+    .error { background: rgba(248,113,113,0.15); color: #fca5a5; }
     .track {
       display: grid;
       grid-template-columns: 140px 1fr;
@@ -80,86 +127,96 @@
     .art {
       width: 140px;
       height: 140px;
-      border-radius: 14px;
-      background: #111827;
+      border-radius: 8px;
+      background: #0b0c0d;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #334155;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      border: 2px solid #050505;
     }
     .art img { width: 100%; height: 100%; object-fit: cover; }
-    .track h3 { margin: 0; }
-    .track .artists { margin: 6px 0 0; color: var(--muted); }
+    .track h3 { margin: 0; font-family: var(--pixel); letter-spacing: 0.02em; font-size: 16px; }
+    .track .artists { margin: 6px 0 0; color: var(--muted); font-family: var(--pixel); font-size: 11px; }
     pre {
-      background: #0b1020;
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      background: #0b0c0d;
+      border: 2px solid #050505;
+      border-radius: 10px;
       padding: 12px;
       overflow: auto;
       font-family: var(--mono);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       max-height: 240px;
+      color: #9ef5be;
     }
     @media (max-width: 640px) {
+      .panel { grid-template-columns: 1fr; }
       .track { grid-template-columns: 1fr; }
       .art { width: 100%; height: auto; aspect-ratio: 1 / 1; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <section class="card">
-      <h1>Spotify Now Playing</h1>
-      <p>Simple client-side PKCE flow that shows your current track. Tokens stay in your browser. Register the redirect URI shown below in your Spotify app.</p>
-    </section>
-
-    <section class="card">
-      <div class="row">
-        <div class="label">Redirect URI to register in Spotify</div>
-        <div class="value" id="redirect-uri">—</div>
+  <main class="winamp">
+    <div class="titlebar">
+      <span>Winamp-ish Now Playing</span>
+      <div class="lights">
+        <div class="light on"></div>
+        <div class="light"></div>
+        <div class="light"></div>
       </div>
-      <button class="secondary" id="copy-redirect">Copy Redirect URI</button>
+    </div>
+    <div class="panel">
+      <section class="section">
+        <h1>Connect</h1>
+        <p>Register the redirect URI below in your Spotify app, then connect. Tokens stay in your browser.</p>
+        <div class="row" style="margin-top:10px;">
+          <div class="label">Redirect URI</div>
+          <div class="value" id="redirect-uri">—</div>
+        </div>
+        <button class="secondary" id="copy-redirect">Copy Redirect URI</button>
 
-      <label for="client-id">Spotify Client ID</label>
-      <input id="client-id" type="text" placeholder="Paste your client_id" autocomplete="off" spellcheck="false">
-      <button id="save-client">Save Client ID</button>
-      <button class="secondary" id="connect">Connect to Spotify</button>
-      <button class="secondary" id="clear">Clear stored tokens</button>
+        <label for="client-id">Spotify Client ID</label>
+        <input id="client-id" type="text" placeholder="Paste your client_id" autocomplete="off" spellcheck="false">
+        <button id="save-client">Save Client ID</button>
+        <button class="secondary" id="connect">Connect to Spotify</button>
+        <button class="secondary" id="clear">Clear stored tokens</button>
+        <div class="row" style="margin-top:10px;">
+          <div class="label">Auth</div>
+          <div class="value" id="auth-state"><span class="status warn">Not connected</span></div>
+        </div>
+      </section>
 
-      <div class="row" style="margin-top:12px;">
-        <div class="label">Auth</div>
-        <div class="value" id="auth-state"><span class="status warn">Not connected</span></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="track">
-        <div class="art" id="art">No artwork</div>
-        <div>
-          <h3 id="title">Nothing playing</h3>
-          <div class="artists" id="artists">—</div>
-          <div style="margin-top:10px;" class="row">
-            <div class="label">Polling</div>
-            <div class="value" id="polling">Every 10s</div>
-          </div>
-          <div class="row">
-            <div class="label">Album</div>
-            <div class="value" id="album">—</div>
-          </div>
-          <div class="row">
-            <div class="label">Year</div>
-            <div class="value" id="year">—</div>
-          </div>
-          <div class="row">
-            <div class="label">Track ID</div>
-            <div class="value mono" id="track-id">—</div>
+      <section class="section">
+        <h1>Now Playing</h1>
+        <div class="track">
+          <div class="art" id="art">No artwork</div>
+          <div>
+            <h3 id="title">Nothing playing</h3>
+            <div class="artists" id="artists">—</div>
+            <div style="margin-top:10px;" class="row">
+              <div class="label">Polling</div>
+              <div class="value" id="polling">Every 10s</div>
+            </div>
+            <div class="row">
+              <div class="label">Album</div>
+              <div class="value" id="album">—</div>
+            </div>
+            <div class="row">
+              <div class="label">Year</div>
+              <div class="value" id="year">—</div>
+            </div>
+            <div class="row">
+              <div class="label">Track ID</div>
+              <div class="value mono" id="track-id">—</div>
+            </div>
           </div>
         </div>
-      </div>
-      <pre id="raw">{}</pre>
-    </section>
+        <pre id="raw">{}</pre>
+      </section>
+    </div>
   </main>
 
   <script>
