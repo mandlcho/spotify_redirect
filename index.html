@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify Redirect Receiver</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 20% 20%, #e0f7ff 0, #f2f6ff 30%, #fef6ec 65%, #fdf4ff 100%);
+      --card: rgba(255, 255, 255, 0.9);
+      --text: #0f172a;
+      --muted: #5b6475;
+      --accent: #0f9d58;
+      --warn: #b45309;
+      --error: #b91c1c;
+      --shadow: 0 16px 60px rgba(15, 23, 42, 0.08);
+      --border: rgba(12, 18, 36, 0.08);
+      --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+      font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+      color: var(--text);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 32px 18px 64px;
+    }
+
+    main {
+      width: min(960px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 10%, rgba(15, 157, 88, 0.12), transparent 45%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2vw + 1rem, 2.3rem);
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.5;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #e8f7ff;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: rgba(15, 157, 88, 0.03);
+    }
+
+    .row .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .row .value {
+      font-weight: 600;
+      max-width: 60%;
+      word-break: break-all;
+      text-align: right;
+    }
+
+    .row .value.mono {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .status.ok { background: rgba(15, 157, 88, 0.12); color: #0b7b45; }
+    .status.warn { background: rgba(217, 119, 6, 0.15); color: var(--warn); }
+    .status.error { background: rgba(185, 28, 28, 0.12); color: var(--error); }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    button {
+      border: none;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      width: 100%;
+    }
+
+    button:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(15, 23, 42, 0.24); }
+    button:active { transform: translateY(0); box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2); }
+    button.secondary { background: #ffffff; color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    pre {
+      background: #0b1222;
+      color: #e3f2ff;
+      padding: 18px;
+      border-radius: 12px;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      margin: 12px 0 0;
+      border: 1px solid #0d1b36;
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    a { color: #0f9d58; font-weight: 600; }
+
+    @media (max-width: 640px) {
+      body { padding: 18px 14px 48px; }
+      .row { flex-direction: column; align-items: flex-start; }
+      .row .value { max-width: 100%; text-align: left; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card hero">
+      <div class="pill">Spotify OAuth</div>
+      <div>
+        <h1>Redirect catcher & token viewer</h1>
+        <p>This page is safe to use as your Spotify redirect URI. It captures the OAuth response (code or access token), shows it plainly, lets you copy it, and can push it back to the opening window.</p>
+      </div>
+    </section>
+
+    <section class="card grid">
+      <div class="summary">
+        <div class="row">
+          <div class="label">Flow detected</div>
+          <div class="value" id="flow-value">Looking&hellip;</div>
+        </div>
+        <div class="row">
+          <div class="label">State</div>
+          <div class="value mono" id="state-value">—</div>
+        </div>
+        <div class="row">
+          <div class="label">Access token / Code</div>
+          <div class="value mono" id="token-value">—</div>
+        </div>
+        <div class="row">
+          <div class="label">Result</div>
+          <div class="value" id="status-value"><span class="status warn">Waiting for data</span></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="copy-btn">Copy payload as JSON</button>
+        <button id="post-btn" class="secondary">Send payload to opener</button>
+        <button id="clean-btn" class="secondary">Clean token fragment from URL</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row" style="border-style: solid; background: rgba(15, 157, 88, 0.06); margin-bottom: 10px;">
+        <div class="label">Scopes</div>
+        <div class="value mono" id="scope-value">—</div>
+      </div>
+      <div class="label" style="font-weight: 700;">Parsed payload</div>
+      <pre id="payload-box">{}</pre>
+    </section>
+
+    <section class="card">
+      <div class="label" style="font-weight: 700; margin-bottom: 6px;">How to use this page</div>
+      <ul>
+        <li>Set your Spotify App redirect URI to this page's URL.</li>
+        <li>For the Authorization Code flow, you'll see the <code>code</code> and <code>state</code> query parameters.</li>
+        <li>For the Implicit Grant flow, tokens appear in the hash fragment; we immediately parse them and offer to remove them from the address bar.</li>
+        <li>If you opened the auth window from another page, hit "Send payload to opener" to post the JSON back via <code>window.postMessage</code>.</li>
+        <li>Use the copy button to paste the payload into your integration or CLI quickly.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+
+    const payload = {
+      flow: 'none',
+      code: searchParams.get('code'),
+      state: searchParams.get('state') || hashParams.get('state'),
+      access_token: hashParams.get('access_token'),
+      token_type: hashParams.get('token_type'),
+      expires_in: hashParams.get('expires_in'),
+      scope: (hashParams.get('scope') || searchParams.get('scope') || '').split(' ').filter(Boolean),
+      error: searchParams.get('error') || hashParams.get('error'),
+      received_at: new Date().toISOString(),
+      raw: {
+        query: Object.fromEntries(searchParams.entries()),
+        hash: Object.fromEntries(hashParams.entries())
+      }
+    };
+
+    payload.flow = payload.access_token ? 'implicit' : payload.code ? 'authorization_code' : 'none';
+
+    const flowValue = document.getElementById('flow-value');
+    const tokenValue = document.getElementById('token-value');
+    const stateValue = document.getElementById('state-value');
+    const statusValue = document.getElementById('status-value');
+    const scopeValue = document.getElementById('scope-value');
+    const payloadBox = document.getElementById('payload-box');
+    const copyBtn = document.getElementById('copy-btn');
+    const postBtn = document.getElementById('post-btn');
+    const cleanBtn = document.getElementById('clean-btn');
+
+    function badge(text, kind) {
+      const span = document.createElement('span');
+      span.className = `status ${kind}`;
+      span.textContent = text;
+      return span;
+    }
+
+    function summarizeToken() {
+      if (payload.error) return payload.error;
+      if (payload.flow === 'implicit' && payload.access_token) return `token: ${payload.access_token.slice(0, 10)}…`;
+      if (payload.flow === 'authorization_code' && payload.code) return `code: ${payload.code}`;
+      return 'None';
+    }
+
+    function render() {
+      flowValue.textContent = payload.flow === 'none' ? 'None detected yet' : payload.flow;
+      stateValue.textContent = payload.state || '—';
+      tokenValue.textContent = summarizeToken();
+      scopeValue.textContent = payload.scope.length ? payload.scope.join(', ') : '—';
+
+      statusValue.innerHTML = '';
+      if (payload.error) {
+        statusValue.appendChild(badge(`Error: ${payload.error}`, 'error'));
+      } else if (payload.flow === 'none') {
+        statusValue.appendChild(badge('No OAuth data yet', 'warn'));
+      } else {
+        statusValue.appendChild(badge('OAuth data captured', 'ok'));
+      }
+
+      payloadBox.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    function copyPayload() {
+      const text = JSON.stringify(payload, null, 2);
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => (copyBtn.textContent = 'Copy payload as JSON'), 1400);
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
+    function postToOpener() {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ source: 'spotify-redirect', payload }, '*');
+        postBtn.textContent = 'Sent!';
+        setTimeout(() => (postBtn.textContent = 'Send payload to opener'), 1400);
+      } else {
+        postBtn.textContent = 'No opener available';
+        setTimeout(() => (postBtn.textContent = 'Send payload to opener'), 1600);
+      }
+    }
+
+    function cleanFragment() {
+      const nextUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+      window.history.replaceState({}, document.title, nextUrl);
+      cleanBtn.textContent = 'Fragment cleared';
+      setTimeout(() => (cleanBtn.textContent = 'Clean token fragment from URL'), 1400);
+    }
+
+    copyBtn.addEventListener('click', copyPayload);
+    postBtn.addEventListener('click', postToOpener);
+    cleanBtn.addEventListener('click', cleanFragment);
+
+    render();
+
+    // By default remove the token fragment after parsing to avoid leaking it.
+    if (window.location.hash) {
+      setTimeout(() => {
+        const nextUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+        window.history.replaceState({}, document.title, nextUrl);
+      }, 20);
+    }
+  </script>
+</body>
+</html>
